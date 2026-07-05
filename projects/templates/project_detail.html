@@ -1,0 +1,391 @@
+{% extends "base.html" %}
+
+{% block title %}{{ project.title }} - AI Project Recommender{% endblock %}
+
+{% block extra_css %}
+<style>
+    .project-hero {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px 35px;
+        border-radius: var(--radius);
+        margin-bottom: 30px;
+    }
+
+    .project-hero h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .project-hero p {
+        opacity: 0.9;
+        font-size: 1.05rem;
+    }
+
+    .project-meta {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 16px;
+        margin-top: 18px;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: rgba(255, 255, 255, 0.12);
+        padding: 10px 16px;
+        border-radius: 10px;
+        font-size: 0.95rem;
+    }
+
+    .content-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 30px;
+    }
+
+    @media (max-width: 768px) {
+        .content-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .section-card {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: var(--radius);
+        padding: 24px;
+        margin-bottom: 20px;
+        transition: var(--transition);
+    }
+
+    .section-card:hover {
+        border-color: rgba(102, 126, 234, 0.2);
+    }
+
+    .section-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 14px;
+        color: var(--text-primary);
+    }
+
+    .section-card p {
+        color: var(--text-secondary);
+        line-height: 1.7;
+    }
+
+    .sidebar-card {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: var(--radius);
+        padding: 24px;
+        margin-bottom: 20px;
+    }
+
+    .sidebar-card h3 {
+        font-size: 1rem;
+        font-weight: 700;
+        margin-bottom: 14px;
+    }
+
+    .action-buttons {
+        display: grid;
+        gap: 12px;
+    }
+
+    .action-buttons .btn {
+        width: 100%;
+        text-align: center;
+    }
+
+    .skills-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .skill-badge {
+        display: inline-block;
+        padding: 6px 16px;
+        background: rgba(102, 126, 234, 0.15);
+        border: 1px solid rgba(102, 126, 234, 0.2);
+        border-radius: 20px;
+        color: #a8b5ff;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .resources {
+        display: grid;
+        gap: 10px;
+    }
+
+    .resource-link {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 16px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--card-border);
+        border-radius: 10px;
+        text-decoration: none;
+        color: var(--text-secondary);
+        transition: var(--transition);
+        font-weight: 500;
+    }
+
+    .resource-link:hover {
+        border-color: #667eea;
+        color: #fff;
+        background: rgba(102, 126, 234, 0.1);
+    }
+
+    .resource-link .icon {
+        font-size: 1.2rem;
+    }
+
+    .btn-outline {
+        background: transparent;
+        border: 1px solid var(--card-border);
+        color: var(--text-secondary);
+    }
+
+    .btn-outline:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+    }
+
+    .btn-success {
+        background: #10b981;
+        color: white;
+        border: none;
+    }
+
+    .btn-success:hover {
+        background: #059669;
+    }
+
+    .btn-info {
+        background: #3b82f6;
+        color: white;
+        border: none;
+    }
+
+    .btn-info:hover {
+        background: #2563eb;
+    }
+
+    .notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 14px 24px;
+        border-radius: 10px;
+        color: white;
+        font-weight: 600;
+        z-index: 9999;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateX(100px);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    .notification.success {
+        background: #10b981;
+    }
+
+    .notification.error {
+        background: #ef4444;
+    }
+
+    .notification.info {
+        background: #3b82f6;
+    }
+
+    .notification.warning {
+        background: #f59e0b;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="max-width: 1100px; margin: 0 auto;">
+
+    <!-- Hero Section -->
+    <div class="project-hero">
+        <h1>{{ project.title }}</h1>
+        <p>{{ project.short_description }}</p>
+
+        <div class="project-meta">
+            <div class="meta-item">📚 {{ project.get_domain_display }}</div>
+            <div class="meta-item">📊 {{ project.get_difficulty_display }}</div>
+            <div class="meta-item">⏱️ {{ project.estimated_hours|default:"40" }} Hours</div>
+            {% if project.supervisor_approved %}
+            <div class="meta-item">⭐ Supervisor Approved</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content-grid">
+
+        <!-- Left Column -->
+        <div>
+
+            <!-- Overview -->
+            <div class="section-card">
+                <div class="section-title">📝 Overview</div>
+                <p>{{ project.full_description|default:project.short_description }}</p>
+            </div>
+
+            <!-- Required Skills -->
+            <div class="section-card">
+                <div class="section-title">🛠️ Required Skills</div>
+                <div class="skills-grid">
+                    {% for skill in required_skills %}
+                    <span class="skill-badge">{{ skill.name }}</span>
+                    {% empty %}
+                    <p style="color: var(--text-muted);">No specific skills required</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Resources -->
+            {% if project.dataset_url or project.github_url %}
+            <div class="section-card">
+                <div class="section-title">📦 Resources</div>
+                <div class="resources">
+                    {% if project.dataset_url %}
+                    <a href="{{ project.dataset_url }}" target="_blank" class="resource-link">
+                        <span class="icon">📊</span> View Dataset
+                    </a>
+                    {% endif %}
+                    {% if project.github_url %}
+                    <a href="{{ project.github_url }}" target="_blank" class="resource-link">
+                        <span class="icon">💻</span> GitHub Repository
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+
+        <!-- Right Column - Sidebar -->
+        <div>
+
+            <!-- Actions -->
+            <div class="sidebar-card">
+                <h3>⚡ Quick Actions</h3>
+                <div class="action-buttons">
+                    <a href="/recommendations/" class="btn btn-secondary">🔙 Back to Recommendations</a>
+                    {% if project.dataset_url %}
+                    <a href="{{ project.dataset_url }}" target="_blank" class="btn btn-primary">📊 View Dataset</a>
+                    {% endif %}
+                    <a href="/register/" class="btn btn-outline">✏️ Update Profile</a>
+                    <button class="btn btn-success" onclick="downloadProjectInfo()">📥 Download Info</button>
+                    <button class="btn btn-info" onclick="shareProject()">🔗 Share Project</button>
+                </div>
+            </div>
+
+            <!-- Interests -->
+            {% if interests %}
+            <div class="sidebar-card">
+                <h3>🎯 Related Interests</h3>
+                <div class="skills-grid">
+                    {% for interest in interests %}
+                    <span class="skill-badge">{{ interest.name }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function downloadProjectInfo() {
+        // Simple download as text file
+        const projectInfo = `
+        Project: {{ project.title }}
+        Domain: {{ project.get_domain_display }}
+        Difficulty: {{ project.get_difficulty_display }}
+        Hours: {{ project.estimated_hours|default:"40" }}
+        Supervisor Approved: {% if project.supervisor_approved %}Yes{% else %}No{% endif %}
+        Description: {{ project.short_description }}
+        `;
+
+        const blob = new Blob([projectInfo], { type: 'text/plain' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = '{{ project.title|slugify }}_info.txt';
+        link.click();
+        URL.revokeObjectURL(link.href);
+
+        showNotification('Download started!', 'success');
+    }
+
+    function shareProject() {
+        const url = window.location.href;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(url)
+                .then(() => {
+                    showNotification('Link copied to clipboard!', 'success');
+                })
+                .catch(() => {
+                    fallbackCopy(url);
+                });
+        } else {
+            fallbackCopy(url);
+        }
+    }
+
+    function fallbackCopy(text) {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+            document.execCommand('copy');
+            showNotification('Link copied to clipboard!', 'success');
+        } catch (e) {
+            showNotification('Failed to copy link', 'error');
+        }
+        document.body.removeChild(textarea);
+    }
+
+    function showNotification(message, type = 'info') {
+        const div = document.createElement('div');
+        div.className = `notification ${type}`;
+        div.textContent = message;
+        document.body.appendChild(div);
+
+        setTimeout(() => {
+            div.style.opacity = '0';
+            div.style.transition = 'opacity 0.3s';
+            setTimeout(() => {
+                div.remove();
+            }, 300);
+        }, 3000);
+    }
+</script>
+{% endblock %}

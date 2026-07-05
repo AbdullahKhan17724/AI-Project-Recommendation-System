@@ -1,0 +1,372 @@
+{% extends "base.html" %}
+
+{% block title %}Get Started - AI Project Recommender{% endblock %}
+
+{% block extra_css %}
+<style>
+    .register-container {
+        max-width: 900px;
+        margin: 0 auto 30px;
+    }
+    .register-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .register-header h1 {
+        font-size: 2.2rem;
+        font-weight: 800;
+        margin-bottom: 6px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+       
+    }
+    .register-header p {
+        color: var(--text-secondary);
+        font-size: 1.05rem;
+    }
+    .form-section {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: var(--radius);
+        padding: 24px;
+        margin-bottom: 20px;
+    }
+    .form-section h3 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 16px;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+    @media (max-width: 768px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    .skills-grid, .interests-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 10px;
+    }
+    .skill-checkbox, .interest-checkbox {
+        display: none;
+    }
+    .skill-label, .interest-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 8px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 2px solid var(--card-border);
+        border-radius: 10px;
+        cursor: pointer;
+        transition: var(--transition);
+        font-weight: 500;
+        text-align: center;
+        font-size: 0.85rem;
+        min-height: 42px;
+        color: var(--text-secondary);
+    }
+    .skill-checkbox:checked + .skill-label,
+    .interest-checkbox:checked + .interest-label {
+        background: rgba(102, 126, 234, 0.2);
+        color: #a8b5ff;
+        border-color: #667eea;
+        transform: scale(1.03);
+    }
+    .skill-label:hover, .interest-label:hover {
+        border-color: rgba(102, 126, 234, 0.4);
+        background: rgba(255, 255, 255, 0.06);
+    }
+    .form-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-top: 8px;
+    }
+    @media (max-width: 480px) {
+        .form-actions {
+            grid-template-columns: 1fr;
+        }
+    }
+    .btn-large {
+        padding: 14px 28px;
+        font-size: 1rem;
+    }
+    .btn-outline {
+        background: transparent;
+        border: 1px solid var(--card-border);
+        color: var(--text-secondary);
+        text-align: center;
+    }
+    .btn-outline:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+    }
+    .form-group label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        margin-bottom: 6px;
+    }
+    .form-group .form-control {
+        width: 100%;
+        padding: 12px 14px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid var(--card-border);
+        border-radius: 10px;
+        color: #fff;
+        font-size: 15px;
+        transition: var(--transition);
+        outline: none;
+    }
+    .form-group .form-control:focus {
+        border-color: #667eea;
+        background: rgba(255, 255, 255, 0.1);
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+    }
+    .form-group .form-control::placeholder {
+        color: var(--text-muted);
+    }
+    .form-group select.form-control {
+        appearance: none;
+        cursor: pointer;
+    }
+    .form-group select.form-control option {
+        background: #1a1a2e;
+        color: #fff;
+    }
+    .checkbox-gpu {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        margin-top: 12px;
+        color: var(--text-secondary);
+    }
+    .checkbox-gpu input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        accent-color: #667eea;
+        cursor: pointer;
+    }
+    .custom-skills-area {
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid var(--card-border);
+    }
+    .custom-skills-area .form-control {
+        margin-bottom: 10px;
+    }
+    .custom-skills-area .btn-add-skill {
+        padding: 8px 20px;
+        background: rgba(102, 126, 234, 0.15);
+        border: 1px solid rgba(102, 126, 234, 0.25);
+        border-radius: 8px;
+        color: #a8b5ff;
+        cursor: pointer;
+        transition: var(--transition);
+        font-weight: 600;
+    }
+    .custom-skills-area .btn-add-skill:hover {
+        background: rgba(102, 126, 234, 0.3);
+    }
+    .custom-skill-tag {
+        display: inline-block;
+        padding: 4px 14px;
+        background: rgba(102, 126, 234, 0.25);
+        border: 1px solid rgba(102, 126, 234, 0.3);
+        border-radius: 20px;
+        color: #a8b5ff;
+        font-size: 13px;
+        margin: 4px 6px 4px 0;
+    }
+    .custom-skill-tag .remove {
+        cursor: pointer;
+        margin-left: 6px;
+        color: rgba(255, 255, 255, 0.4);
+    }
+    .custom-skill-tag .remove:hover {
+        color: #f87171;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="register-container">
+
+    <div class="register-header">
+        <h1>🎯 Setup Your Profile</h1>
+        <p>Tell us about your skills and interests to get personalized recommendations</p>
+    </div>
+
+    <form method="POST" autocomplete="off">
+        {% csrf_token %}
+
+        <!-- Basic Info Section -->
+        <div class="form-section">
+            <h3>👤 Basic Information</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="name">Name *</label>
+                    <input type="text" id="name" name="name" class="form-control" placeholder="Your name" autocomplete="off" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email *</label>
+                    <input type="email" id="email" name="email" class="form-control" placeholder="your@email.com" autocomplete="off" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="semester">Current Semester *</label>
+                    <select id="semester" name="semester" class="form-control" required>
+                        <option value="">Select Semester</option>
+                        <option value="1">1st Semester</option>
+                        <option value="2">2nd Semester</option>
+                        <option value="3">3rd Semester</option>
+                        <option value="4">4th Semester</option>
+                        <option value="5">5th Semester</option>
+                        <option value="6">6th Semester</option>
+                        <option value="7">7th Semester</option>
+                        <option value="8">8th Semester</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="experience_level">Experience Level *</label>
+                    <select id="experience_level" name="experience_level" class="form-control" required>
+                        <option value="beginner">🌟 Beginner - No coding experience</option>
+                        <option value="intermediate">📚 Intermediate - Know basics</option>
+                        <option value="advanced">🚀 Advanced - Ready for complex projects</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="time_available">Available Time *</label>
+                    <select id="time_available" name="time_available" class="form-control" required>
+                        <option value="3">3 months (Short)</option>
+                        <option value="6" selected>6 months (Medium)</option>
+                        <option value="9">9 months (Long)</option>
+                        <option value="12">12 months (Full semester)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="roll_number">Roll Number *</label>
+                    <input type="text" id="roll_number" name="roll_number" class="form-control" placeholder="e.g., 227003" autocomplete="off" required>
+                </div>
+            </div>
+
+            <label class="checkbox-gpu">
+                <input type="checkbox" name="has_gpu">
+                I have GPU/High-end computer access (for AI/ML projects)
+            </label>
+        </div>
+
+        <!-- Skills Section -->
+        <div class="form-section">
+            <h3>🛠️ Programming Skills</h3>
+            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 16px;">Select all skills you have or are learning</p>
+            <div class="skills-grid">
+                {% for skill in skills %}
+                <div>
+                    <input type="checkbox" id="skill_{{ skill.id }}" name="skills" value="{{ skill.id }}" class="skill-checkbox">
+                    <label for="skill_{{ skill.id }}" class="skill-label">{{ skill.name }}</label>
+                </div>
+                {% empty %}
+                <p style="color: var(--text-muted); grid-column: 1/-1; text-align: center; padding: 20px;">No skills available</p>
+                {% endfor %}
+            </div>
+
+            <!-- Custom Skills Input -->
+            <div class="custom-skills-area">
+                <label style="color: var(--text-secondary); font-weight: 600; font-size: 14px;">Add your own skills (optional)</label>
+                <div style="display: flex; gap: 10px; margin-top: 8px;">
+                    <input type="text" id="customSkillInput" class="form-control" placeholder="e.g., Flutter, FastAPI, Unity" style="flex:1;">
+                    <button type="button" class="btn-add-skill" onclick="addCustomSkill()">➕ Add</button>
+                </div>
+                <div id="customSkillsContainer" style="margin-top: 10px;"></div>
+                <input type="hidden" name="custom_skills" id="customSkillsHidden">
+            </div>
+        </div>
+
+        <!-- Interests Section -->
+        <div class="form-section">
+            <h3>🎯 Interests</h3>
+            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 16px;">Select areas that interest you</p>
+            <div class="interests-grid">
+                {% for interest in interests %}
+                <div>
+                    <input type="checkbox" id="interest_{{ interest.id }}" name="interests" value="{{ interest.id }}" class="interest-checkbox">
+                    <label for="interest_{{ interest.id }}" class="interest-label">{{ interest.name }}</label>
+                </div>
+                {% empty %}
+                <p style="color: var(--text-muted); grid-column: 1/-1; text-align: center; padding: 20px;">No interests available</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+            <a href="/" class="btn btn-secondary btn-large">← Back</a>
+            <button type="submit" class="btn btn-primary btn-large">🔮 Get Recommendations →</button>
+        </div>
+    </form>
+
+</div>
+
+<script>
+    function addCustomSkill() {
+        const input = document.getElementById('customSkillInput');
+        const container = document.getElementById('customSkillsContainer');
+        const hidden = document.getElementById('customSkillsHidden');
+        const skill = input.value.trim();
+
+        if (!skill) return;
+
+        // Check if already added
+        const tags = container.querySelectorAll('.custom-skill-tag');
+        for (let tag of tags) {
+            if (tag.textContent.replace(' ×', '') === skill) return;
+        }
+
+        const tag = document.createElement('span');
+        tag.className = 'custom-skill-tag';
+        tag.innerHTML = skill + ' <span class="remove" onclick="removeCustomSkill(this)">×</span>';
+        container.appendChild(tag);
+        input.value = '';
+
+        updateHiddenSkills();
+    }
+
+    function removeCustomSkill(el) {
+        el.parentElement.remove();
+        updateHiddenSkills();
+    }
+
+    function updateHiddenSkills() {
+        const container = document.getElementById('customSkillsContainer');
+        const hidden = document.getElementById('customSkillsHidden');
+        const skills = [];
+        container.querySelectorAll('.custom-skill-tag').forEach(el => {
+            skills.push(el.textContent.replace(' ×', ''));
+        });
+        hidden.value = skills.join(',');
+    }
+
+    // Enter key support
+    document.getElementById('customSkillInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addCustomSkill();
+        }
+    });
+</script>
+{% endblock %}

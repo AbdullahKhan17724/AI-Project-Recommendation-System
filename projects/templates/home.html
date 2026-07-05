@@ -1,0 +1,315 @@
+{% extends "base.html" %}
+
+{% block title %}Home - AI Project Recommender{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 60px 20px;
+        text-align: center;
+        border-radius: var(--radius);
+        margin-bottom: 40px;
+    }
+
+    .hero h1 {
+        font-size: 2.8rem;
+        font-weight: 800;
+        margin-bottom: 16px;
+    }
+
+    .hero p {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        margin-bottom: 30px;
+    }
+
+    .hero-cta {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .btn-outline {
+        background: transparent;
+        border: 2px solid rgba(255, 255, 255, 0.5);
+        color: white;
+    }
+
+    .btn-outline:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: #fff;
+    }
+
+    .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 20px;
+        margin: 30px 0;
+    }
+
+    .stat-card {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: var(--radius);
+        padding: 24px;
+        text-align: center;
+        transition: var(--transition);
+    }
+
+    .stat-card:hover {
+        border-color: rgba(102, 126, 234, 0.3);
+    }
+
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #667eea;
+        margin-bottom: 4px;
+    }
+
+    .stat-label {
+        color: var(--text-muted);
+        font-size: 14px;
+        margin-top: 4px;
+    }
+
+    .projects-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 24px;
+        margin: 20px 0;
+    }
+
+    .project-card {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        transition: var(--transition);
+    }
+
+    .project-card:hover {
+        transform: translateY(-6px);
+        border-color: rgba(102, 126, 234, 0.3);
+    }
+
+    .project-header {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 16px 20px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        min-height: 60px;
+        display: flex;
+        align-items: center;
+    }
+
+    .project-body {
+        padding: 20px;
+    }
+
+    .project-domain {
+        display: inline-block;
+        padding: 4px 14px;
+        background: rgba(102, 126, 234, 0.15);
+        color: #a8b5ff;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+
+    .domains-section {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: var(--radius);
+        padding: 24px;
+        margin: 30px 0;
+    }
+
+    .domains-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 16px;
+        margin-top: 16px;
+    }
+
+    .domain-item {
+        background: rgba(255, 255, 255, 0.03);
+        padding: 16px;
+        border-radius: 12px;
+        text-align: center;
+        border: 1px solid var(--card-border);
+        transition: var(--transition);
+        cursor: default;
+    }
+
+    .domain-item:hover {
+        border-color: rgba(102, 126, 234, 0.3);
+        background: rgba(255, 255, 255, 0.06);
+    }
+
+    .domain-icon {
+        font-size: 2rem;
+        margin-bottom: 6px;
+    }
+
+    .domain-name {
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 2px;
+    }
+
+    .domain-count {
+        font-size: 13px;
+        color: var(--text-muted);
+    }
+
+    .cta-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 50px 30px;
+        border-radius: var(--radius);
+        text-align: center;
+        margin: 40px 0;
+    }
+
+    .cta-section h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 12px;
+    }
+
+    .cta-section p {
+        opacity: 0.9;
+        margin-bottom: 24px;
+    }
+
+    .cta-section .btn {
+        background: white;
+        color: #667eea;
+        font-weight: 700;
+    }
+
+    .cta-section .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .skill-tag {
+        display: inline-block;
+        padding: 4px 14px;
+        background: rgba(102, 126, 234, 0.15);
+        border: 1px solid rgba(102, 126, 234, 0.2);
+        border-radius: 20px;
+        color: #a8b5ff;
+        font-size: 12px;
+        margin: 4px 6px 4px 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<div class="hero">
+    <h1>🚀 Find Your Perfect Final Year Project</h1>
+    <p>AI-Powered Recommendations Tailored to Your Skills & Interests</p>
+    <div class="hero-cta">
+        <a href="/register/" class="btn btn-primary">🎯 Get Started Now</a>
+        <a href="#projects" class="btn btn-outline">🔍 Browse Projects</a>
+    </div>
+</div>
+
+<!-- Stats -->
+<div class="stats">
+    <div class="stat-card">
+        <div class="stat-value">{{ total_projects|default:500 }}+</div>
+        <div class="stat-label">Active Projects</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ total_skills|default:100 }}+</div>
+        <div class="stat-label">Skills Available</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ approved_projects|default:100 }}+</div>
+        <div class="stat-label">Supervisor Approved</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ total_interests|default:20 }}+</div>
+        <div class="stat-label">Interest Areas</div>
+    </div>
+</div>
+
+<!-- Popular Projects -->
+<h2 style="font-size: 24px; font-weight: 700; margin: 30px 0 16px;">🔥 Popular Projects</h2>
+<p style="color: var(--text-secondary); margin-bottom: 20px;">Trending recommendations across all students</p>
+
+<div class="projects-grid" id="projects">
+    {% for project in popular_projects %}
+    <div class="project-card">
+        <div class="project-header">{{ project.title|truncatechars:40 }}</div>
+        <div class="project-body">
+            <span class="project-domain">{{ project.get_domain_display }}</span>
+            <p style="color: var(--text-secondary); font-size: 14px; margin: 8px 0 12px;">
+                {{ project.short_description|truncatechars:60 }}
+            </p>
+            <div style="margin-bottom: 12px;">
+                {% for interest in project.interests.all|slice:":2" %}
+                <span class="skill-tag">{{ interest.name }}</span>
+                {% endfor %}
+            </div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                {% if project.supervisor_approved %}
+                <span class="badge badge-approve">⭐ Supervisor Approved</span>
+                {% endif %}
+                <span class="badge badge-success">✅ {{ project.required_skills.count }} Skills</span>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <p style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">No projects available yet</p>
+    {% endfor %}
+</div>
+
+<!-- Domains -->
+<div class="domains-section">
+    <h2 style="font-size: 20px; font-weight: 700;">📚 Explore by Domain</h2>
+    <p style="color: var(--text-secondary); font-size: 14px;">Find projects across different technology domains</p>
+    <div class="domains-grid">
+        {% for domain, count in domains.items %}
+        <div class="domain-item">
+            <div class="domain-icon">
+                {% if 'Artificial' in domain %}🤖
+                {% elif 'Machine' in domain %}📊
+                {% elif 'Deep' in domain %}🧠
+                {% elif 'Web' in domain %}🌐
+                {% elif 'Data' in domain %}📈
+                {% elif 'Mobile' in domain %}📱
+                {% elif 'Cyber' in domain %}🔒
+                {% elif 'Blockchain' in domain %}⛓️
+                {% elif 'IoT' in domain %}🏠
+                {% elif 'Game' in domain %}🎮
+                {% elif 'Cloud' in domain %}☁️
+                {% elif 'DevOps' in domain %}⚙️
+                {% else %}💡
+                {% endif %}
+            </div>
+            <div class="domain-name">{{ domain|truncatechars:20 }}</div>
+            <div class="domain-count">{{ count }} projects</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- CTA Section -->
+<div class="cta-section">
+    <h2>Ready to Find Your Perfect Project?</h2>
+    <p>Our AI-powered recommendation system will match you with projects based on your skills, interests, and experience level.</p>
+    <a href="/register/" class="btn">🚀 Start Recommendations</a>
+</div>
+
+{% endblock %}

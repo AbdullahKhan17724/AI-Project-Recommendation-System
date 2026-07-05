@@ -1,0 +1,318 @@
+{% extends "base.html" %}
+
+{% block title %}Compare Projects - AI Project Recommender{% endblock %}
+
+{% block extra_css %}
+<style>
+    .compare-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        margin: 30px 0;
+    }
+
+    @media (max-width: 768px) {
+        .compare-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .compare-card {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: var(--radius);
+        padding: 24px;
+        transition: var(--transition);
+    }
+
+    .compare-card:hover {
+        border-color: rgba(102, 126, 234, 0.3);
+    }
+
+    .compare-header {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .compare-header h2 {
+        font-size: 1.3rem;
+        margin-bottom: 6px;
+    }
+
+    .compare-header .badge {
+        background: rgba(255, 255, 255, 0.2);
+        color: #fff;
+        padding: 4px 14px;
+        border-radius: 20px;
+        font-size: 12px;
+    }
+
+    .compare-section {
+        margin-bottom: 20px;
+    }
+
+    .compare-section h3 {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #a8b5ff;
+        margin-bottom: 10px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--card-border);
+    }
+
+    .compare-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--card-border);
+    }
+
+    .compare-item:last-child {
+        border-bottom: none;
+    }
+
+    .compare-label {
+        font-weight: 600;
+        color: var(--text-secondary);
+    }
+
+    .compare-value {
+        color: var(--text-primary);
+        font-weight: 600;
+    }
+
+    .comparison-table {
+        width: 100%;
+        margin-top: 30px;
+        border-collapse: collapse;
+        background: var(--card-bg);
+        border-radius: var(--radius);
+        overflow: hidden;
+        border: 1px solid var(--card-border);
+    }
+
+    .comparison-table th,
+    .comparison-table td {
+        padding: 14px 18px;
+        text-align: left;
+        border-bottom: 1px solid var(--card-border);
+    }
+
+    .comparison-table th {
+        background: rgba(102, 126, 234, 0.15);
+        font-weight: 700;
+        color: #a8b5ff;
+    }
+
+    .comparison-table td:first-child {
+        color: var(--text-secondary);
+        font-weight: 600;
+    }
+
+    .winner {
+        background: rgba(16, 185, 129, 0.1);
+        font-weight: 700;
+        color: #34d399;
+    }
+
+    .actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-top: 30px;
+    }
+
+    @media (max-width: 480px) {
+        .actions {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .alert-warning {
+        background: rgba(251, 191, 36, 0.1);
+        border: 1px solid rgba(251, 191, 36, 0.2);
+        border-radius: var(--radius);
+        padding: 20px;
+        text-align: center;
+        color: #fbbf24;
+    }
+
+    .btn-outline {
+        background: transparent;
+        border: 1px solid var(--card-border);
+        color: var(--text-secondary);
+        text-align: center;
+    }
+
+    .btn-outline:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+    }
+
+    .tag {
+        display: inline-block;
+        padding: 4px 14px;
+        background: rgba(102, 126, 234, 0.15);
+        border: 1px solid rgba(102, 126, 234, 0.2);
+        border-radius: 20px;
+        color: #a8b5ff;
+        font-size: 13px;
+        margin: 4px 6px 4px 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="max-width: 1200px; margin: 0 auto;">
+
+    <h1 style="font-size: 28px; font-weight: 700; margin-bottom: 8px;">📊 Compare Projects</h1>
+    <p style="color: var(--text-secondary); margin-bottom: 30px;">Side-by-side comparison to help you choose the right project</p>
+
+    {% if project1 and project2 %}
+    <div class="compare-grid">
+        <!-- Project 1 -->
+        <div class="compare-card">
+            <div class="compare-header">
+                <h2>{{ project1.title }}</h2>
+                <span class="badge">{{ project1.get_domain_display }}</span>
+            </div>
+
+            <div class="compare-section">
+                <h3>📝 Overview</h3>
+                <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6;">{{ project1.short_description }}</p>
+            </div>
+
+            <div class="compare-section">
+                <h3>⚙️ Details</h3>
+                <div class="compare-item">
+                    <span class="compare-label">Difficulty</span>
+                    <span class="compare-value">{{ project1.get_difficulty_display }}</span>
+                </div>
+                <div class="compare-item">
+                    <span class="compare-label">Est. Hours</span>
+                    <span class="compare-value">{{ project1.estimated_hours|default:"N/A" }}</span>
+                </div>
+                <div class="compare-item">
+                    <span class="compare-label">Supervisor Approved</span>
+                    <span class="compare-value">{% if project1.supervisor_approved %}✅ Yes{% else %}❌ No{% endif %}</span>
+                </div>
+            </div>
+
+            <div class="compare-section">
+                <h3>🛠️ Skills Required</h3>
+                {% for skill in project1.required_skills.all|slice:":5" %}
+                <span class="tag">{{ skill.name }}</span>
+                {% empty %}
+                <span style="color: var(--text-muted); font-size: 14px;">No skills listed</span>
+                {% endfor %}
+            </div>
+
+            <a href="/project/{{ project1.id }}/" class="btn btn-primary" style="width: 100%; text-align: center; margin-top: 15px;">
+                🔍 View Full Details
+            </a>
+        </div>
+
+        <!-- Project 2 -->
+        <div class="compare-card">
+            <div class="compare-header">
+                <h2>{{ project2.title }}</h2>
+                <span class="badge">{{ project2.get_domain_display }}</span>
+            </div>
+
+            <div class="compare-section">
+                <h3>📝 Overview</h3>
+                <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6;">{{ project2.short_description }}</p>
+            </div>
+
+            <div class="compare-section">
+                <h3>⚙️ Details</h3>
+                <div class="compare-item">
+                    <span class="compare-label">Difficulty</span>
+                    <span class="compare-value">{{ project2.get_difficulty_display }}</span>
+                </div>
+                <div class="compare-item">
+                    <span class="compare-label">Est. Hours</span>
+                    <span class="compare-value">{{ project2.estimated_hours|default:"N/A" }}</span>
+                </div>
+                <div class="compare-item">
+                    <span class="compare-label">Supervisor Approved</span>
+                    <span class="compare-value">{% if project2.supervisor_approved %}✅ Yes{% else %}❌ No{% endif %}</span>
+                </div>
+            </div>
+
+            <div class="compare-section">
+                <h3>🛠️ Skills Required</h3>
+                {% for skill in project2.required_skills.all|slice:":5" %}
+                <span class="tag">{{ skill.name }}</span>
+                {% empty %}
+                <span style="color: var(--text-muted); font-size: 14px;">No skills listed</span>
+                {% endfor %}
+            </div>
+
+            <a href="/project/{{ project2.id }}/" class="btn btn-primary" style="width: 100%; text-align: center; margin-top: 15px;">
+                🔍 View Full Details
+            </a>
+        </div>
+    </div>
+
+    <!-- Summary Table -->
+    <h2 style="font-size: 20px; margin-top: 30px; margin-bottom: 16px;">📋 Comparison Summary</h2>
+    <table class="comparison-table">
+        <thead>
+            <tr>
+                <th>Attribute</th>
+                <th>{{ project1.title|truncatechars:20 }}</th>
+                <th>{{ project2.title|truncatechars:20 }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Domain</td>
+                <td>{{ project1.get_domain_display }}</td>
+                <td>{{ project2.get_domain_display }}</td>
+            </tr>
+            <tr>
+                <td>Difficulty</td>
+                <td class="{% if project1.difficulty < project2.difficulty %}winner{% endif %}">{{ project1.get_difficulty_display }}</td>
+                <td class="{% if project2.difficulty < project1.difficulty %}winner{% endif %}">{{ project2.get_difficulty_display }}</td>
+            </tr>
+            <tr>
+                <td>Skills Required</td>
+                <td class="{% if project1.required_skills.count < project2.required_skills.count %}winner{% endif %}">{{ project1.required_skills.count }}</td>
+                <td class="{% if project2.required_skills.count < project1.required_skills.count %}winner{% endif %}">{{ project2.required_skills.count }}</td>
+            </tr>
+            <tr>
+                <td>Est. Hours</td>
+                <td class="{% if project1.estimated_hours and project1.estimated_hours < project2.estimated_hours %}winner{% endif %}">{{ project1.estimated_hours|default:"N/A" }}</td>
+                <td class="{% if project2.estimated_hours and project2.estimated_hours < project1.estimated_hours %}winner{% endif %}">{{ project2.estimated_hours|default:"N/A" }}</td>
+            </tr>
+            <tr>
+                <td>Supervisor Approved</td>
+                <td class="{% if project1.supervisor_approved and not project2.supervisor_approved %}winner{% endif %}">
+                    {% if project1.supervisor_approved %}✅ Yes{% else %}❌ No{% endif %}
+                </td>
+                <td class="{% if project2.supervisor_approved and not project1.supervisor_approved %}winner{% endif %}">
+                    {% if project2.supervisor_approved %}✅ Yes{% else %}❌ No{% endif %}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="actions">
+        <a href="/recommendations/" class="btn btn-secondary">← Back to Recommendations</a>
+        <a href="/" class="btn btn-secondary">🏠 Home</a>
+    </div>
+
+    {% else %}
+    <div class="alert-warning">
+        <p style="font-size: 16px;">⚠️ Please select two projects to compare</p>
+        <a href="/recommendations/" class="btn btn-primary" style="margin-top: 16px;">Go to Recommendations</a>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,300 @@
+{% extends "base.html" %}
+
+{% block title %}Recommendations - AI Project Recommender{% endblock %}
+
+{% block extra_css %}
+<style>
+    .rec-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .rec-header h1 {
+        font-size: 24px;
+        font-weight: 700;
+    }
+
+    .rec-header .sub {
+        color: var(--text-secondary);
+        font-size: 14px;
+    }
+
+    .student-info {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: var(--radius);
+        padding: 20px;
+        margin-bottom: 24px;
+    }
+
+    .student-info .name {
+        font-size: 20px;
+        font-weight: 600;
+    }
+
+    .student-info .detail {
+        color: var(--text-secondary);
+        font-size: 14px;
+        margin-top: 4px;
+    }
+
+    .student-info .skills {
+        margin-top: 10px;
+    }
+
+    .project-item {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: var(--radius);
+        padding: 20px;
+        margin-bottom: 16px;
+        transition: var(--transition);
+    }
+
+    .project-item:hover {
+        border-color: rgba(102, 126, 234, 0.3);
+    }
+
+    .project-item .title {
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    .project-item .domain {
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-left: 10px;
+    }
+
+    .project-item .desc {
+        color: var(--text-secondary);
+        font-size: 14px;
+        margin: 8px 0 12px;
+        line-height: 1.5;
+    }
+
+    .project-item .match {
+        font-size: 28px;
+        font-weight: 700;
+        color: #667eea;
+    }
+
+    .project-item .badges {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin: 8px 0;
+    }
+
+    .project-item .skills-section {
+        margin: 12px 0;
+    }
+
+    .project-item .skills-section .label {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        margin-bottom: 4px;
+    }
+
+    .project-item .actions {
+        margin-top: 12px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .flex-between {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .btn-outline {
+        background: transparent;
+        border: 1px solid var(--card-border);
+        color: var(--text-secondary);
+    }
+
+    .btn-outline:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+    }
+
+    .skill-tag-missing {
+        background: rgba(239, 68, 68, 0.15) !important;
+        border-color: rgba(239, 68, 68, 0.25) !important;
+        color: #f87171 !important;
+    }
+
+    .no-match-msg {
+        background: rgba(251, 191, 36, 0.08);
+        border: 1px solid rgba(251, 191, 36, 0.15);
+        border-radius: 10px;
+        padding: 12px 16px;
+        margin: 12px 0;
+        color: #fbbf24;
+        font-weight: 500;
+    }
+
+    .no-skills-msg {
+        text-align: center;
+        padding: 40px;
+        background: var(--card-bg);
+        border-radius: var(--radius);
+        border: 1px solid var(--card-border);
+    }
+
+    .no-skills-msg h3 {
+        font-size: 20px;
+        margin-bottom: 10px;
+    }
+
+    .no-skills-msg p {
+        color: var(--text-secondary);
+    }
+
+    .badge-warning {
+        background: rgba(251, 191, 36, 0.15);
+        color: #fbbf24;
+        border: 1px solid rgba(251, 191, 36, 0.2);
+    }
+
+    .badge-success {
+        background: rgba(16, 185, 129, 0.15);
+        color: #34d399;
+        border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    .badge-approve {
+        background: rgba(102, 126, 234, 0.2);
+        color: #a8b5ff;
+        border: 1px solid rgba(102, 126, 234, 0.2);
+    }
+
+    .learning-path-btn {
+        display: inline-block;
+        padding: 8px 20px;
+        background: rgba(251, 191, 36, 0.15);
+        border: 1px solid rgba(251, 191, 36, 0.25);
+        border-radius: 8px;
+        color: #fbbf24;
+        text-decoration: none;
+        font-weight: 600;
+        transition: var(--transition);
+    }
+
+    .learning-path-btn:hover {
+        background: rgba(251, 191, 36, 0.25);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="max-width: 1000px; margin: 0 auto;">
+
+    <div class="rec-header">
+        <div>
+            <h1>🎯 Your Recommendations</h1>
+            <div class="sub">Personalized projects based on your skills and interests</div>
+        </div>
+        <a href="/register/" class="btn btn-secondary btn-sm">🔄 Start Over</a>
+    </div>
+
+    <!-- Student Info -->
+    <div class="student-info">
+        <div class="name">👋 Hello, {{ student.name }}!</div>
+        <div class="detail">Email: {{ student.email }} | Semester: {{ student.semester }}</div>
+        <div class="detail">Experience: {{ student.get_experience_level_display }}</div>
+        <div class="skills">
+            <strong>Your Skills:</strong>
+            {% for skill in student.skills.all %}
+            <span class="skill-tag">{{ skill.name }}</span>
+            {% empty %}
+            <span style="color:var(--text-muted);">No skills selected</span>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Projects -->
+    {% if projects %}
+        {% for item in projects %}
+        <div class="project-item">
+            <div class="flex-between">
+                <div>
+                    <span class="title">{{ forloop.counter }}. {{ item.project.title }}</span>
+                    <span class="domain">{{ item.project.get_domain_display }}</span>
+                </div>
+                {% if item.approved %}
+                <span class="badge badge-approve">⭐ Supervisor Approved</span>
+                {% endif %}
+            </div>
+
+            <div class="desc">{{ item.project.short_description }}</div>
+
+            <!-- Show Match ONLY if there is at least 1 common skill -->
+            {% if item.common|length > 0 %}
+                <div class="match">{{ item.match }}% Match</div>
+            {% else %}
+                <div class="no-match-msg">
+                    📚 No skills matched. Focus on learning the required skills first.
+                </div>
+            {% endif %}
+
+            <div class="badges">
+                {% if item.common|length > 0 %}
+                <span class="badge badge-success">✅ {{ item.common|length }} skills match</span>
+                {% endif %}
+                {% if item.missing %}
+                <span class="badge badge-warning">📚 {{ item.missing|length }} skills to learn</span>
+                {% endif %}
+            </div>
+
+            <!-- Skills you have (ONLY show if there are common skills) -->
+            {% if item.common %}
+            <div class="skills-section">
+                <div class="label">✅ Skills you have:</div>
+                {% for skill in item.common %}
+                <span class="skill-tag">{{ skill }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Skills to learn (ALWAYS show if missing skills exist) -->
+            {% if item.missing %}
+            <div class="skills-section">
+                <div class="label">📚 Skills to learn:</div>
+                {% for skill in item.missing %}
+                <span class="skill-tag skill-tag-missing">{{ skill }}</span>
+                {% endfor %}
+                <!-- Learning Path Button -->
+                <div style="margin-top: 10px;">
+                    <a href="/learning-path/" class="learning-path-btn">📖 View Learning Path →</a>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="actions">
+                {% if item.project.dataset_url %}
+                <a href="{{ item.project.dataset_url }}" target="_blank" class="btn btn-secondary btn-sm">📊 Dataset</a>
+                {% endif %}
+                <a href="/project/{{ item.project.id }}/" class="btn btn-secondary btn-sm">🔍 View Details</a>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="no-skills-msg">
+            <h3>😊 No projects match your profile</h3>
+            <p>Try updating your skills or selecting different interests.</p>
+            <a href="/register/" class="btn btn-primary btn-sm" style="margin-top:16px;">✏️ Update Profile</a>
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

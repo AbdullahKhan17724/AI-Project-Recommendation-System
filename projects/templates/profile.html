@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - AI Project Recommender{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-container {
+        max-width: 800px;
+        margin: 0 auto 30px;
+    }
+
+    .profile-section {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: var(--radius);
+        padding: 24px;
+        margin-bottom: 24px;
+        transition: var(--transition);
+    }
+
+    .profile-section:hover {
+        border-color: rgba(102, 126, 234, 0.2);
+    }
+
+    .profile-section h2 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 16px;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .form-grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 4px;
+    }
+
+    @media (max-width: 600px) {
+        .form-grid-2 {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .skills-selection {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+        gap: 10px;
+        margin-bottom: 4px;
+    }
+
+    .skill-checkbox {
+        display: none;
+    }
+
+    .skill-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 8px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 2px solid var(--card-border);
+        border-radius: 10px;
+        cursor: pointer;
+        transition: var(--transition);
+        font-weight: 500;
+        text-align: center;
+        font-size: 0.85rem;
+        min-height: 40px;
+        color: var(--text-secondary);
+    }
+
+    .skill-checkbox:checked + .skill-label {
+        background: rgba(102, 126, 234, 0.2);
+        color: #a8b5ff;
+        border-color: #667eea;
+    }
+
+    .skill-label:hover {
+        border-color: rgba(102, 126, 234, 0.4);
+        background: rgba(255, 255, 255, 0.06);
+    }
+
+    .form-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-top: 8px;
+    }
+
+    @media (max-width: 480px) {
+        .form-actions {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .btn-large {
+        padding: 14px 28px;
+        font-size: 1rem;
+    }
+
+    .btn-outline {
+        background: transparent;
+        border: 1px solid var(--card-border);
+        color: var(--text-secondary);
+        text-align: center;
+    }
+
+    .btn-outline:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+    }
+
+    .readonly-input {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+
+    <h1 style="font-size: 28px; font-weight: 700; margin-bottom: 4px;">👤 My Profile</h1>
+    <p style="color: var(--text-secondary); margin-bottom: 24px;">Manage your skills, interests, and preferences</p>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <!-- Personal Info -->
+        <div class="profile-section">
+            <h2>📋 Personal Information</h2>
+            <div class="form-grid-2">
+                <div class="form-group">
+                    <label class="form-label">Name</label>
+                    <input type="text" name="name" class="form-control" value="{{ student.name }}" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" name="email" class="form-control readonly-input" value="{{ student.email }}" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Roll Number</label>
+                    <input type="text" name="roll_number" class="form-control" value="{{ student.roll_number }}" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Current Semester</label>
+                    <select name="semester" class="form-control">
+                        <option value="1" {% if student.semester == 1 %}selected{% endif %}>1st Semester</option>
+                        <option value="2" {% if student.semester == 2 %}selected{% endif %}>2nd Semester</option>
+                        <option value="3" {% if student.semester == 3 %}selected{% endif %}>3rd Semester</option>
+                        <option value="4" {% if student.semester == 4 %}selected{% endif %}>4th Semester</option>
+                        <option value="5" {% if student.semester == 5 %}selected{% endif %}>5th Semester</option>
+                        <option value="6" {% if student.semester == 6 %}selected{% endif %}>6th Semester</option>
+                        <option value="7" {% if student.semester == 7 %}selected{% endif %}>7th Semester</option>
+                        <option value="8" {% if student.semester == 8 %}selected{% endif %}>8th Semester</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Academic Settings -->
+        <div class="profile-section">
+            <h2>⚙️ Academic Settings</h2>
+            <div class="form-grid-2">
+                <div class="form-group">
+                    <label class="form-label">Experience Level</label>
+                    <select name="experience_level" class="form-control">
+                        <option value="beginner" {% if student.experience_level == 'beginner' %}selected{% endif %}>🌟 Beginner</option>
+                        <option value="intermediate" {% if student.experience_level == 'intermediate' %}selected{% endif %}>📚 Intermediate</option>
+                        <option value="advanced" {% if student.experience_level == 'advanced' %}selected{% endif %}>🚀 Advanced</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Time Available</label>
+                    <select name="time_available" class="form-control">
+                        <option value="3" {% if student.time_available == 3 %}selected{% endif %}>3 months</option>
+                        <option value="6" {% if student.time_available == 6 %}selected{% endif %}>6 months</option>
+                        <option value="9" {% if student.time_available == 9 %}selected{% endif %}>9 months</option>
+                        <option value="12" {% if student.time_available == 12 %}selected{% endif %}>12 months</option>
+                    </select>
+                </div>
+            </div>
+            <div style="margin-top: 12px;">
+                <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                    <input type="checkbox" name="has_gpu" {% if student.has_gpu %}checked{% endif %} style="width: 20px; height: 20px; accent-color: #667eea;">
+                    <span style="color: var(--text-secondary);">I have GPU/High-end computer access</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Skills Selection -->
+        <div class="profile-section">
+            <h2>🛠️ Your Skills</h2>
+            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 16px;">Select all skills you have or are learning</p>
+            <div class="skills-selection">
+                {% for skill in skills %}
+                <div>
+                    <input type="checkbox" id="skill_{{ skill.id }}" name="skills" value="{{ skill.id }}" class="skill-checkbox" {% if skill.id in student_skills %}checked{% endif %}>
+                    <label for="skill_{{ skill.id }}" class="skill-label">{{ skill.name }}</label>
+                </div>
+                {% empty %}
+                <p style="color: var(--text-muted); grid-column: 1/-1; text-align: center; padding: 20px;">No skills available</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Interests Selection -->
+        <div class="profile-section">
+            <h2>🎯 Your Interests</h2>
+            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 16px;">Select areas that interest you</p>
+            <div class="skills-selection">
+                {% for interest in interests %}
+                <div>
+                    <input type="checkbox" id="interest_{{ interest.id }}" name="interests" value="{{ interest.id }}" class="skill-checkbox" {% if interest.id in student_interests %}checked{% endif %}>
+                    <label for="interest_{{ interest.id }}" class="skill-label">{{ interest.name }}</label>
+                </div>
+                {% empty %}
+                <p style="color: var(--text-muted); grid-column: 1/-1; text-align: center; padding: 20px;">No interests available</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="form-actions">
+            <a href="/dashboard/" class="btn btn-secondary btn-large">← Cancel</a>
+            <button type="submit" class="btn btn-primary btn-large">💾 Save Changes</button>
+        </div>
+    </form>
+
+</div>
+{% endblock %}
